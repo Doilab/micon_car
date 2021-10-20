@@ -1,5 +1,5 @@
 //専門実験・演習B ロボット制御２
-//2021.10.07 Takahiro Doi
+//2021.10.20 Takahiro Doi
 //以下3つのうちどれか一つだけを有効にすること
 #define WEEK_1 //第1週の実験のときはここを有効にする
 //#define WEEK_2 //第2週の実験のときはここを有効にする
@@ -215,18 +215,15 @@ void w2_zn_tuning(void)
 //変数定義
   char stop_flag=0;
   int mode;
-  double kp,ti,td;//制御パラメータ
+  double kp;//制御パラメータ（限界感度法ではPのみ）．
   double e;//error（制御偏差）
-  double de_dt;//errorの時間微分
-  double e_s=0;//errrorの時間積分
   long dt_msec=SAMPLING_TIME_MSEC;//サンプリングタイムmsec
   double dt=(double)SAMPLING_TIME_MSEC/1000.0;//サンプリングタイム[sec]
-  double e_prev=0;//1周期前のerror
   double m_pwm=0;//ステアリングモータへの出力
   long time_prev;//前回状態表示した時刻
 
 //制御実行前の準備
-mode=MODE_P;//P補償
+mode=MODE_P;//P補償に固定
 
 if(mode==MODE_P)//P補償
 {
@@ -238,8 +235,8 @@ if(mode==MODE_P)//P補償
 //制御パラメータ表示
   Serial.println(" ");
   Serial.println("===Start ZN tuning =====");
-  if(mode==MODE_P)Serial.print("P-control ");
-  else Serial.print("?-control ");
+  Serial.print("P-control ");
+  
   Serial.print("(kp)= ");
   Serial.print(kp,4);//小数点以下4桁まで表示
   Serial.println(" ");
@@ -263,7 +260,7 @@ if(mode==MODE_P)//P補償
     if(stop_flag==1)break;//ループから抜ける
 
 
-    //制御側
+    //制御則
     e = (double)sensor_L_data-(double)sensor_R_data;
 
     if(mode==MODE_P) m_pwm=kp*e; //p補償
@@ -316,7 +313,7 @@ void w3_line_trace(void)
   double kp,ti,td;//制御パラメータ
   double e;//error（制御偏差）
   double de_dt;//errorの時間微分
-  double e_s=0;//errrorの時間積分
+  double e_s=0;//errrorの時間積分．初期値ゼロ
   long dt_msec=SAMPLING_TIME_MSEC;//サンプリングタイムmsec
   double dt=(double)SAMPLING_TIME_MSEC/1000.0;//サンプリングタイム[sec]
   double e_prev=0;//1周期前のerror
@@ -392,7 +389,7 @@ time_prev=time_now;
     if(stop_flag==1)break;//ループから抜ける
 
 
-    //制御側
+    //制御則
     e = (double)sensor_L_data-(double)sensor_R_data;
     de_dt=(e-e_prev)/dt;//微分
     e_s+=e*dt;//積分
@@ -400,8 +397,7 @@ time_prev=time_now;
 
     if(mode==MODE_P) m_pwm=kp*e; //p補償
     if(mode==MODE_PI) m_pwm=kp*(e+(e_s/ti));//PI補償．tiがゼロにならないように注意．
-//    if(mode==MODE_PID) m_pwm=kp*(e+(e_s/ti)+e_s*td);//PID補償．tiがゼロにならないように注意．
-    if(mode==MODE_PID) m_pwm=kp*(e+(e_s/ti)+de_dt*td);//PID補償．tiがゼロにならないように注意．181116修正
+    if(mode==MODE_PID) m_pwm=kp*(e+(e_s/ti)+de_dt*td);//PID補償．tiがゼロにならないように注意．
     if(mode==MODE_ORIGINAL)
     {
       //ここに独自に考えた制御則を書く
