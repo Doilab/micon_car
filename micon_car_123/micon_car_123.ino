@@ -220,7 +220,7 @@ void w2_zn_tuning(void)
   long dt_msec=SAMPLING_TIME_MSEC;//サンプリングタイムmsec
   double dt=(double)SAMPLING_TIME_MSEC/1000.0;//サンプリングタイム[sec]
   double m_pwm=0;//ステアリングモータへの出力
-  long time_prev;//前回状態表示した時刻
+  long time_prev=0;//前回状態表示した時刻
 
 //制御実行前の準備
 mode=MODE_P;//P補償に固定
@@ -247,7 +247,7 @@ if(mode==MODE_P)//P補償
   //--------- whileループここから ------------
   while(1)
   {
-    update_status();//センサ状態更新
+    update_status();//センサ状態更新．time_now更新も含む
     if((time_now-time_prev)>50)//50msecに1度だけ状態表示
     {
       print_status();
@@ -319,7 +319,7 @@ void w3_line_trace(void)
   double e_prev=0;//1周期前のerror
   double m_pwm=0;//ステアリングモータへの出力（0～1）
   double m_pwm2=0.5;//タイヤ駆動用モータのPWM（一定値．0～1）ステップ応答の実験の際にはゼロにしておく．
-  long time_prev;//前回状態表示した時刻
+  long time_prev=0;//前回状態表示した時刻
 
 //制御実行前の準備
 //補償方式を選ぶ
@@ -369,14 +369,15 @@ if(mode==MODE_ORIGINAL)//各班独自の補償
   
   delay(1000);//実行前待機
 
-time_now=millis();
-time_prev=time_now;
+  //time_now=millis();//211021 update
+  //time_prev=time_now;//211021 update
+  time_prev=0;//211021 update
 
   //制御処理（無限ループ）
   //--------- whileループここから ------------
   while(1)
   {
-    update_status();//センサ状態更新
+    update_status();//センサ状態更新．time_now更新も含む
     if((time_now-time_prev)>50)//50msecに1度だけ状態表示
     {
       print_status();
@@ -443,27 +444,25 @@ time_prev=time_now;
 
 //---------------------------------------------------
 void loop() {
-//メインの処理
-//L4～L6の#defineを確認してから実行すること．
-
-//第1週のプログラム
-#ifdef WEEK_1
-w1_sensor_test();//センサテスト用関数（ループなし）
-#endif
-
-//スイッチで第2週，第3週のプログラム開始
-//if((digitalRead(8)==LOW)&&(digitalRead(9)==LOW))//両方押した場合
-if((digitalRead(8)==LOW)||(digitalRead(9)==LOW))//どちらか押した場合
-{
-#ifdef WEEK_2
-  Serial.println(" zn_tuning ");
-  w2_zn_tuning();//限界感度法によるチューニング（無限ループ）
-#endif
-#ifdef WEEK_3
-  Serial.println(" line_trace ");
-  w3_line_trace();//ライントレース処理（無限ループ）
-#endif
+  //メインの処理
+  //L4～L6の#defineを確認してから実行すること．
   
-}
-
+  //第1週のプログラム
+  #ifdef WEEK_1
+  w1_sensor_test();//センサテスト用関数（ループなし）
+  #endif
+  
+  //スイッチで第2週，第3週のプログラム開始
+  //if((digitalRead(8)==LOW)&&(digitalRead(9)==LOW))//両方押した場合
+  if((digitalRead(8)==LOW)||(digitalRead(9)==LOW))//どちらか押した場合
+    {
+    #ifdef WEEK_2
+      Serial.println(" zn_tuning ");
+      w2_zn_tuning();//限界感度法によるチューニング（無限ループ）
+    #endif
+    #ifdef WEEK_3
+      Serial.println(" line_trace ");
+      w3_line_trace();//ライントレース処理（無限ループ）
+    #endif
+    }
 }
