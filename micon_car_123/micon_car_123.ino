@@ -227,7 +227,7 @@ mode=MODE_P;//P補償に固定
 
 if(mode==MODE_P)//P補償
 {
-   kp=0.005;//☆☆☆☆☆☆　ここを調整する　☆☆☆☆☆☆☆
+   kp=0.008;//☆☆☆☆☆☆　ここを調整する　☆☆☆☆☆☆☆
 }
 
 
@@ -242,7 +242,8 @@ if(mode==MODE_P)//P補償
   Serial.println(" ");
   
   delay(1000);//実行前待機
-
+  time_start=millis();//時刻初期値更新
+  time_prev=-50;//231220
   //制御処理（無限ループ）
   //--------- whileループここから ------------
   while(1)
@@ -320,6 +321,7 @@ void w3_line_trace(void)
   double m_pwm=0;//ステアリングモータへの出力（0～1）
   double m_pwm2=0.5;//タイヤ駆動用モータのPWM（一定値．0～1）ステップ応答の実験の際にはゼロにしておく．
   long time_prev=0;//前回状態表示した時刻
+  time_start=millis();//時刻初期値更新
 
 //制御実行前の準備
 //補償方式を選ぶ
@@ -369,9 +371,10 @@ if(mode==MODE_ORIGINAL)//各班独自の補償
   
   delay(1000);//実行前待機
 
-  //time_now=millis();//211021 update
+  time_now=millis();//211021 update
   //time_prev=time_now;//211021 update
-  time_prev=0;//211021 update
+  time_prev=-50;//211021 update
+  time_start=time_now;//231220 update　スタート時刻更新
 
   //制御処理（無限ループ）
   //--------- whileループここから ------------
