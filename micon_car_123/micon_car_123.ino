@@ -1,5 +1,5 @@
 //専門実験・演習B ロボット制御２
-//2025.10.10 Takahiro Doi ☆
+//2026.10.10 Takahiro Doi ☆
 //以下3つのうちどれか一つだけを有効にすること
 #define WEEK_1 //第1週の実験のときはここを有効にする
 //#define WEEK_2 //第2週の実験のときはここを有効にする
@@ -155,7 +155,7 @@ void setup() {
 //---------------------------------------------------
 //　第1週　センサデータと基本機能の確認
 //---------------------------------------------------
-void w1_sensor_test(void)
+void w1_function_test(void)
 {
   //テスト用関数
 int motor_no=0;
@@ -181,7 +181,7 @@ else if(digitalRead(9)==LOW)
   delay(50);
 
 
-//  for(motor_no=1; motor_no<=2; motor_no++)
+//  モータテスト
   if((motor_no==1)||(motor_no==2))
   {
    Serial.print("motor-");
@@ -452,7 +452,7 @@ void loop() {
   
   //第1週のプログラム
   #ifdef WEEK_1
-  w1_sensor_test();//センサテスト用関数（ループなし）
+  w1_function_test();//機能テスト用関数
   #endif
   
   //スイッチで第2週，第3週のプログラム開始
@@ -460,12 +460,12 @@ void loop() {
   if((digitalRead(8)==LOW)||(digitalRead(9)==LOW))//どちらか押した場合
     {
     #ifdef WEEK_2
-      Serial.println(" zn_tuning ");
-      w2_zn_tuning();//限界感度法によるチューニング（無限ループ）
+      Serial.println(" W2 zn_tuning ");
+      w2_zn_tuning();//限界感度法によるチューニング（関数内部ループあり）
     #endif
     #ifdef WEEK_3
-      Serial.println(" line_trace ");
-      w3_line_trace();//ライントレース処理（無限ループ）
+      Serial.println(" W3 line_trace ");
+      w3_line_trace();//ライントレース処理（関数内部ループあり）
     #endif
     }
 }
